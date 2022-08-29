@@ -1,7 +1,13 @@
+import { useSession, signIn, signOut } from "next-auth/react"
 import React from "react"
 
 const Home: React.FC = () => {
-    return <h1>hello world!</h1>
+    const { data: session, status } = useSession()
+
+    if (session) {
+        return <button onClick={() => signOut()}>Sign Out</button>
+    }
+    return <button onClick={() => signIn()}>Sign In</button>
 }
 
 export default Home
