@@ -45,8 +45,8 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    Meeting       Meeting[]
-    DateRange     DateRange[]
+    meetings      Meeting[]
+    dateRanges    DateRange[]
 }
 
 model VerificationToken {
@@ -58,12 +58,13 @@ model VerificationToken {
 }
 
 model Meeting {
-    id        String      @id @default(cuid())
-    ownerId   String
-    owner     User        @relation(fields: [ownerId], references: [id])
-    start     Int
-    end       Int
-    DateRange DateRange[]
+    id         String      @id @default(cuid())
+    name       String      @db.Text
+    ownerId    String
+    owner      User        @relation(fields: [ownerId], references: [id])
+    start      Int
+    end        Int
+    dateRanges DateRange[]
 }
 
 model DateRange {
