@@ -61,7 +61,7 @@ model Meeting {
     id         String      @id @default(cuid())
     name       String      @db.Text
     ownerId    String
-    owner      User        @relation(fields: [ownerId], references: [id])
+    owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     start      Int
     end        Int
     dateRanges DateRange[]
@@ -70,9 +70,9 @@ model Meeting {
 model DateRange {
     id        String  @id @default(cuid())
     meetingId String
-    meeting   Meeting @relation(fields: [meetingId], references: [id])
+    meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
     userId    String
-    user      User    @relation(fields: [userId], references: [id])
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     start     Int
     end       Int
 }
