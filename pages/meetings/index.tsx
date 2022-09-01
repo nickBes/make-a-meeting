@@ -19,20 +19,15 @@ export const getServerSideProps: GetServerSideProps<{ meetings: Meeting[] }> = a
         }
     }
 
-    const user = await prisma.user.findUnique({
+    const meetings = await prisma.meeting.findMany({
         where: {
-            email: session.user.email
-        },
-        select: {
-            meetings: true
+            owner: {
+                email: session.user.email
+            }
         }
     })
 
-    if (user == null) {
-        return { notFound: true }
-    }
-
-    return { props: user }
+    return { props: { meetings } }
 }
 
 const Meetings: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ meetings }) => {

@@ -36,8 +36,6 @@ const Create: React.FC = () => {
                 end
             }
 
-            console.log(createMeetingData)
-
             mutation.mutate(createMeetingData)
         }
     }
