@@ -1,4 +1,4 @@
-// import { DateRange } from "@prisma/client"
+import { DateRange } from "@prisma/client"
 
 const MS_IN_DAYS = 1000 * 60 * 60 * 24
 
@@ -10,13 +10,22 @@ export function dateToDays(date: Date): number {
     return Math.round(date.getTime() / MS_IN_DAYS)
 }
 
+export function daysToDate(days: number): Date {
+    return new Date(days * MS_IN_DAYS)
+}
 
-
-export function attendanceFromRanges(ranges: { start: number, end: number }[]): {
+export function attendanceFromRanges(ranges: DateRange[]): {
     attendance: number[],
     offset: number
 } {
     const rangesLength = ranges.length
+
+    if (rangesLength == 0) {
+        return {
+            attendance: [],
+            offset: 0
+        }
+    }
 
     // end always bigger then start
     // hence the min will always be a start
@@ -48,6 +57,8 @@ export function attendanceFromRanges(ranges: { start: number, end: number }[]): 
         end[range.end - min]++
     })
 
+    // inc represents the depth inside date ranges
+    // which is equivalent to the attendance at day i
     let inc = attendance[0] = start[0]
 
     for (let i = 1; i < attendanceLength; i++) {
