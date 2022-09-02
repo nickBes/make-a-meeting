@@ -2,6 +2,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { DateRange } from "@prisma/client"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import { unstable_getServerSession } from "next-auth"
+import { attendanceFromRanges } from "@/utils"
 import prisma from "@/prisma/db"
 import React from "react"
 
@@ -36,8 +37,13 @@ export const getServerSideProps: GetServerSideProps<{ ranges: DateRange[] }, { m
 }
 
 const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ ranges }) => {
+    console.log(attendanceFromRanges([
+        { start: 1, end: 4 },
+        { start: -1, end: 2 },
+        { start: 3, end: 5 }
+    ]))
     return (
-        <>register</>
+        <> register</>
     )
 }
 
