@@ -4,6 +4,7 @@ import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next"
 import React from "react"
 import { Button, Stack } from "@mantine/core"
 import Link from "next/link"
+import { attendanceFromRanges, daysToDate } from "@/utils"
 
 // !todo
 // in the future we'll also fetch the date 
@@ -16,7 +17,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     return { paths, fallback: "blocking" }
 }
 
-export const getStaticProps: GetStaticProps<{ meeting: Meeting }, { meetingId?: string }> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<{ meeting: Meeting, day: number }, { meetingId?: string }> = async ({ params }) => {
     if (!params?.meetingId) {
         return { notFound: true }
     }
@@ -24,6 +25,15 @@ export const getStaticProps: GetStaticProps<{ meeting: Meeting }, { meetingId?: 
     const meeting = await prisma.meeting.findUnique({
         where: {
             id: params.meetingId
+        },
+        include: {
+            dateRanges: {
+                select: {
+                    id: true,
+                    start: true,
+                    end: true
+                }
+            }
         }
     })
 
@@ -31,20 +41,31 @@ export const getStaticProps: GetStaticProps<{ meeting: Meeting }, { meetingId?: 
         return { notFound: true }
     }
 
+    const { attendance, offset } = attendanceFromRanges(meeting.dateRanges)
+    let max = attendance[0]
+    let maxIndex = 0
+
+    for (let i = 0; i < attendance.length; i++) {
+        if (attendance[i] > max) {
+            maxIndex = i
+        }
+    }
+
     return {
-        props: { meeting },
+        props: { meeting, day: maxIndex + offset },
         // every one minute
         revalidate: 60
     }
 }
 
-const Meeting: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ meeting }) => {
+const Meeting: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ meeting, day }) => {
     return (
         <Stack align="center">
             <p>{JSON.stringify(meeting)}</p>
             <Link href={`/meetings/${meeting.id}/register`}>
                 <Button>Register</Button>
             </Link>
+            <p>{daysToDate(day).toDateString()}</p>
         </Stack>
     )
 }

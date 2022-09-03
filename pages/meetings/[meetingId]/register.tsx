@@ -1,13 +1,16 @@
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
-import { DateRange, Meeting } from "@prisma/client"
+import { Meeting } from "@prisma/client"
 import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 import { unstable_getServerSession } from "next-auth"
 import { attendanceFromRanges, dateToDays, daysToDate } from "@/utils"
 import prisma from "@/prisma/db"
-import React, { useState } from "react"
-import { DateRangePicker } from "@mantine/dates"
+import React, { useMemo, useState } from "react"
+import { DateRangePicker, DateRangePickerValue } from "@mantine/dates"
 import { Button, Stack, Title } from "@mantine/core"
 import { useListState } from "@mantine/hooks"
+import { useMutation } from "@tanstack/react-query"
+import { CreateDateRangeData } from "@/pages/api/range"
+import axios from "axios"
 
 export const getServerSideProps: GetServerSideProps<Meeting & {
     dateRanges: {
@@ -61,23 +64,50 @@ export const getServerSideProps: GetServerSideProps<Meeting & {
         }
     }
 
-const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ dateRanges, start, end }) => {
+const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ dateRanges, start, end, id }) => {
     const [ranges, rangesHandler] = useListState(dateRanges)
+    const attendanceMap = useMemo(() => attendanceFromRanges(ranges), [ranges])
     const [days, setDays] = useState<[number, number]>()
-    const attendanceMap = attendanceFromRanges(ranges)
+
+    const createRangeMutation = useMutation(async (createDateRangeData: CreateDateRangeData) => {
+        const response = await axios.post<{ rangeId: string }>("/api/range", createDateRangeData)
+        return {
+            id: response.data.rangeId,
+            start: createDateRangeData.start,
+            end: createDateRangeData.end
+        }
+    }, {
+        onSuccess: (range) => {
+            rangesHandler.append(range)
+        }
+    })
+
+    function setDatesIntoDays([start, end]: DateRangePickerValue) {
+        if (start && end) {
+            setDays([start, end].map(dateToDays) as [number, number])
+        }
+    }
+    function submit() {
+        if (!days) return
+        createRangeMutation.mutate({ meetingId: id, start: days[0], end: days[1] })
+    }
 
     return (
         <Stack align="center">
             <Stack align="center">
                 <Title align="center">{dateRanges.length == 0 ? "No Registered Dates" : "Your Dates"}</Title>
-                {dateRanges.map(range => {
+                {ranges.map(range => {
                     return <DateRangePicker
+                        key={range.id}
                         disabled
                         value={[range.start, range.end].map(daysToDate) as [Date, Date]}
                     />
                 })}
             </Stack>
-            <form>
+            <form onSubmit={e => {
+                e.preventDefault()
+                submit()
+            }}>
                 <Stack>
                     <DateRangePicker
                         label="Add New Dates"
@@ -86,14 +116,13 @@ const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>>
 
                             const day = dateToDays(date) - attendanceMap.offset
 
-                            if (day < 0 || day >= attendanceMap.attendance.length) return true
-
                             return !!attendanceMap.attendance[day]
                         }}
+                        onChange={setDatesIntoDays}
                         minDate={daysToDate(start)}
                         maxDate={daysToDate(end)}
                     />
-                    <Button>Add new date</Button>
+                    <Button type="submit">Add new date</Button>
                 </Stack>
             </form>
         </Stack>
