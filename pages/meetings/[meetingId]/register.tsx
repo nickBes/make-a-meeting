@@ -9,7 +9,13 @@ import { DateRangePicker } from "@mantine/dates"
 import { Button, Stack, Title } from "@mantine/core"
 import { useListState } from "@mantine/hooks"
 
-export const getServerSideProps: GetServerSideProps<Meeting & { dateRanges: DateRange[]; }, { meetingId?: string }>
+export const getServerSideProps: GetServerSideProps<Meeting & {
+    dateRanges: {
+        id: string;
+        start: number;
+        end: number;
+    }[]
+}, { meetingId?: string }>
     = async ({ req, res, params }) => {
         const session = await unstable_getServerSession(req, res, authOptions)
 
@@ -36,6 +42,11 @@ export const getServerSideProps: GetServerSideProps<Meeting & { dateRanges: Date
                         user: {
                             email: session.user.email
                         }
+                    },
+                    select: {
+                        id: true,
+                        start: true,
+                        end: true
                     }
                 }
             }
@@ -50,8 +61,10 @@ export const getServerSideProps: GetServerSideProps<Meeting & { dateRanges: Date
         }
     }
 
-const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ dateRanges }) => {
+const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ dateRanges, start, end }) => {
     const [ranges, rangesHandler] = useListState(dateRanges)
+    const [days, setDays] = useState<[number, number]>()
+    const attendanceMap = attendanceFromRanges(ranges)
 
     return (
         <Stack align="center">
@@ -69,14 +82,16 @@ const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>>
                     <DateRangePicker
                         label="Add New Dates"
                         excludeDate={(date) => {
-                            const attendanceMap = attendanceFromRanges(ranges)
-                            const day = dateToDays(date) - attendanceMap.offset
-                            if (day < 0 || day >= attendanceMap.attendance.length) {
-                                return false
-                            }
+                            if (attendanceMap.attendance.length == 0) return false
 
-                            return !attendanceMap.attendance[day]
+                            const day = dateToDays(date) - attendanceMap.offset
+
+                            if (day < 0 || day >= attendanceMap.attendance.length) return true
+
+                            return !!attendanceMap.attendance[day]
                         }}
+                        minDate={daysToDate(start)}
+                        maxDate={daysToDate(end)}
                     />
                     <Button>Add new date</Button>
                 </Stack>

@@ -2,6 +2,11 @@ import { DateRange } from "@prisma/client"
 
 const MS_IN_DAYS = 1000 * 60 * 60 * 24
 
+interface AttendanceMap {
+    attendance: number[]
+    offset: number
+}
+
 function zeroedArr(len: number): number[] {
     return (new Array(len)).fill(0)
 }
@@ -14,10 +19,11 @@ export function daysToDate(days: number): Date {
     return new Date(days * MS_IN_DAYS)
 }
 
-export function attendanceFromRanges(ranges: DateRange[]): {
-    attendance: number[],
-    offset: number
-} {
+export function attendanceFromRanges(ranges: {
+    id: string;
+    start: number;
+    end: number;
+}[]): AttendanceMap {
     const rangesLength = ranges.length
 
     if (rangesLength == 0) {

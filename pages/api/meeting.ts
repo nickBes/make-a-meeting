@@ -43,7 +43,7 @@ const handler: NextApiHandler<{ meetingId: string }> = async (req, res) => {
         }
     })
 
-    res.status(200).json({ meetingId: meeting.id })
+    res.status(200).send({ meetingId: meeting.id })
 }
 
 export default handler
