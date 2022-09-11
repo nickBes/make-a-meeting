@@ -2,13 +2,10 @@ import prisma from "@/prisma/db"
 import { Meeting } from "@prisma/client"
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next"
 import React from "react"
-import { Button, Stack } from "@mantine/core"
+import { Button, RingProgress, Stack, Title, Card, Badge, Text, ThemeIcon } from "@mantine/core"
 import Link from "next/link"
-import { attendanceFromRanges, daysToDate } from "@/utils"
-
-// !todo
-// in the future we'll also fetch the date 
-// with the highest attendance 
+import { attendanceFromRanges, dateToDays, daysToDate } from "@/utils"
+import { ZoomQuestion } from "tabler-icons-react"
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const meetings = await prisma.meeting.findMany()
@@ -17,7 +14,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     return { paths, fallback: "blocking" }
 }
 
-export const getStaticProps: GetStaticProps<{ meeting: Meeting, day: number }, { meetingId?: string }> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<{ meeting: Meeting, day: number | null, attendance: number, registries: number }, { meetingId?: string }> = async ({ params }) => {
     if (!params?.meetingId) {
         return { notFound: true }
     }
@@ -31,7 +28,8 @@ export const getStaticProps: GetStaticProps<{ meeting: Meeting, day: number }, {
                 select: {
                     id: true,
                     start: true,
-                    end: true
+                    end: true,
+                    userId: true,
                 }
             }
         }
@@ -41,31 +39,98 @@ export const getStaticProps: GetStaticProps<{ meeting: Meeting, day: number }, {
         return { notFound: true }
     }
 
+    if (meeting.dateRanges.length == 0) {
+        return {
+            props: { meeting, day: null, registries: 0, attendance: 0 },
+            // every two minute
+            revalidate: 120
+        }
+    }
+
+    let rangesByUserId = new Set<string>()
+
+    meeting.dateRanges.forEach(range => {
+        rangesByUserId.add(range.userId)
+    })
+
+    const registries = rangesByUserId.size
+
     const { attendance, offset } = attendanceFromRanges(meeting.dateRanges)
     let max = attendance[0]
     let maxIndex = 0
+    let todayIndex = dateToDays(new Date()) - offset
 
-    for (let i = 0; i < attendance.length; i++) {
-        if (attendance[i] > max) {
+
+    if (todayIndex >= attendance.length) {
+        return {
+            props: { meeting, day: null, attendance: 0, registries },
+            // every two minute
+            revalidate: 120
+        }
+    }
+
+    for (let i = todayIndex; i < attendance.length; i++) {
+        const current = attendance[i]
+        if (current > max) {
+            max = current
             maxIndex = i
         }
     }
 
     return {
-        props: { meeting, day: maxIndex + offset },
-        // every one minute
-        revalidate: 60
+        props: {
+            meeting: {
+                id: meeting.id,
+                ownerId: meeting.ownerId,
+                start: meeting.start,
+                end: meeting.end,
+                name: meeting.name,
+                desc: meeting.desc
+            }, day: maxIndex + offset,
+            registries,
+            attendance: max
+        },
+        // every two minute
+        revalidate: 120
     }
 }
 
-const Meeting: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ meeting, day }) => {
+const Meeting: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ meeting, day, attendance, registries }) => {
     return (
-        <Stack align="center">
-            <p>{JSON.stringify(meeting)}</p>
-            <Link href={`/meetings/${meeting.id}/register`}>
-                <Button>Register</Button>
-            </Link>
-            <p>{daysToDate(day).toDateString()}</p>
+        <Stack align="center" p={10} pt={20}>
+            <Card style={{ minHeight: "40vh", display: "flex", alignItems: "center" }} withBorder p="xl">
+                <Stack justify="space-between" align="center">
+                    <Title align="center">{meeting.name}</Title>
+                    <Text align="center" color="dimmed">{meeting.desc == "" || !meeting.desc ? "There is not description" : meeting.desc}</Text>
+                    <Badge variant="dot">Highest attendance date</Badge>
+
+                    {day ? <>
+                        <Title color="dark" order={2}>{new Intl.DateTimeFormat('en', {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                        }).format(daysToDate(day))}</Title>
+                        <RingProgress
+                            thickness={16}
+                            size={200}
+                            label={
+                                <Title color="dark" order={5} align="center">{attendance} of {registries}</Title>
+                            }
+                            sections={[{ value: registries == 0 ? 0 : 100 * (attendance / registries), color: "teal" }]}></RingProgress>
+
+                    </> : <>
+                        <ThemeIcon size="xl" variant="light" color="yellow">
+                            <ZoomQuestion />
+                        </ThemeIcon>
+                        <Text align="center" color="dark" size="md">There are not enough registries</Text>
+                    </>}
+
+                    <Link href={`/meetings/${meeting.id}/register`}>
+                        <Button uppercase>Register</Button>
+                    </Link>
+                </Stack>
+            </Card>
+
         </Stack>
     )
 }

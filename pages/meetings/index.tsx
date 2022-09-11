@@ -4,10 +4,11 @@ import React from "react"
 import { unstable_getServerSession } from "next-auth"
 import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { Meeting } from "@prisma/client"
-import { Button, Card, Stack, Title } from "@mantine/core"
+import { Card, Button, Group, ThemeIcon, Text, Center, Container, Stack, Title, ScrollArea } from "@mantine/core"
 import Link from "next/link"
+import { ZoomQuestion } from "tabler-icons-react"
 
-export const getServerSideProps: GetServerSideProps<{ meetings: Meeting[] }> = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<{ registered: Meeting[] }> = async (ctx) => {
     const session = await unstable_getServerSession(ctx.req, ctx.res, authOptions)
 
     if (!session?.user?.email) {
@@ -19,34 +20,64 @@ export const getServerSideProps: GetServerSideProps<{ meetings: Meeting[] }> = a
         }
     }
 
-    const meetings = await prisma.meeting.findMany({
+    const registered = await prisma.meeting.findMany({
         where: {
-            owner: {
-                email: session.user.email
+            dateRanges: {
+                some: {
+                    user: {
+                        email: session.user.email
+                    }
+                },
             }
         }
     })
 
-    return { props: { meetings } }
+    return { props: { registered } }
 }
 
-const Meetings: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ meetings }) => {
+const Meetings: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ registered }) => {
     return (
-        <Stack align="center">
-            {meetings.map(meeting => {
-                return (
-                    <Card key={meeting.id} withBorder shadow="md">
-                        <Title>{meeting.name}</Title>
-                        <Link href={`/meetings/${meeting.id}`}>
-                            <Button>View</Button>
-                        </Link>
-                    </Card>
-                )
-            })}
-            <Link href={"/meetings/create"}>
-                <Button>Create</Button>
-            </Link>
-        </Stack>
+        <Container p={10} size="xs">
+            <Center>
+                <Stack spacing="xs" align="center">
+                    <Title
+                        align="center"
+                        color="black"
+                        weight="bold">My Meetings</Title>
+                    <Text color="dark" align="center" size="sm">This is a list of your participated meetings</Text>
+                </Stack>
+            </Center>
+            <Center>
+                <ScrollArea.Autosize mt={10} type="always" maxHeight="70vh">
+                    {registered.length == 0 ?
+                        <Card withBorder>
+                            <Stack justify="center" align="center" style={{ minHeight: "30vh" }}>
+                                <ThemeIcon m={10} size="xl" variant="light" color="yellow">
+                                    <ZoomQuestion />
+                                </ThemeIcon>
+                                <Text align="center" color="dark" size="lg">There are no participated meetings</Text>
+                            </Stack>
+                        </Card>
+                        : ""}
+                    <Stack align="stretch">
+                        {registered.map((meeting) => {
+                            return (
+                                <Card p="xl" key={meeting.id} withBorder style={{ minWidth: "50vw" }}>
+                                    <Stack align="stretch" justify="center">
+                                        <Title order={2} color="dark" align="center">{meeting.name}</Title>
+                                        <Group position="center">
+                                            <Link href={`/meetings/${meeting.id}`}>
+                                                <Button uppercase variant="filled">View</Button>
+                                            </Link>
+                                        </Group>
+                                    </Stack>
+                                </Card>
+                            )
+                        })}
+                    </Stack>
+                </ScrollArea.Autosize>
+            </Center>
+        </Container>
     )
 }
 export default Meetings

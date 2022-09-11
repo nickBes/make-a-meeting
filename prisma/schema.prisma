@@ -60,6 +60,7 @@ model VerificationToken {
 model Meeting {
     id         String      @id @default(cuid())
     name       String      @db.Text
+    desc       String?     @db.Text
     ownerId    String
     owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     start      Int

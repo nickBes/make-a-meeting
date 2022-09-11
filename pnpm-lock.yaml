@@ -13,6 +13,7 @@ specifiers:
   '@types/node': 18.7.11
   '@types/react': 18.0.17
   '@types/react-dom': 18.0.6
+  '@types/react-text-truncate': ^0.14.1
   axios: ^0.27.2
   dayjs: ^1.11.5
   eslint: 8.22.0
@@ -22,6 +23,8 @@ specifiers:
   prisma: ^4.2.1
   react: 18.2.0
   react-dom: 18.2.0
+  react-text-truncate: ^0.19.0
+  tabler-icons-react: ^1.54.0
   ts-pattern: ^4.0.5
   typescript: 4.7.4
 
@@ -41,12 +44,15 @@ dependencies:
   next-auth: 4.10.3_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
+  react-text-truncate: 0.19.0_biqbaboplfbrettd7655fr4n2y
+  tabler-icons-react: 1.54.0_react@18.2.0
   ts-pattern: 4.0.5
 
 devDependencies:
   '@types/node': 18.7.11
   '@types/react': 18.0.17
   '@types/react-dom': 18.0.6
+  '@types/react-text-truncate': 0.14.1
   eslint: 8.22.0
   eslint-config-next: 12.2.5_4rv7y5c6xz3vfxwhbrcxxi73bq
   prisma: 4.2.1
@@ -743,6 +749,12 @@ packages:
 
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
+    dependencies:
+      '@types/react': 18.0.17
+    dev: true
+
+  /@types/react-text-truncate/0.14.1:
+    resolution: {integrity: sha512-yCtOOOJzrsfWF6TbnTDZz0gM5JYOxJmewExaTJTv01E7yrmpkNcmVny2fAtsNgSFCp8k2VgCePBoIvFBpKyEOw==}
     dependencies:
       '@types/react': 18.0.17
     dev: true
@@ -2412,7 +2424,6 @@ packages:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
-    dev: true
 
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
@@ -2438,6 +2449,17 @@ packages:
 
   /react-property/2.0.0:
     resolution: {integrity: sha512-kzmNjIgU32mO4mmH5+iUyrqlpFQhF8K2k7eZ4fdLSOPFrD1XgEuSBv9LDEgxRXTMBqMd8ppT0x6TIzqE5pdGdw==}
+    dev: false
+
+  /react-text-truncate/0.19.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-QxHpZABfGG0Z3WEYbRTZ+rXdZn50Zvp+sWZXgVAd7FCKAMzv/kcwctTpNmWgXDTpAoHhMjOVwmgRtX3x5yeF4w==}
+    peerDependencies:
+      react: ^15.4.1 || ^16.0.0 || ^17.0.0 ||  || ^18.0.0
+      react-dom: ^15.4.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /react-textarea-autosize/8.3.4_ug65io7jkbhmo4fihdmbrh3ina:
@@ -2701,6 +2723,14 @@ packages:
   /supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /tabler-icons-react/1.54.0_react@18.2.0:
+    resolution: {integrity: sha512-k+OlS1qm4Ab0RaSapBG3cyMTd2sFJOaBAhzXHek+Y7wZayoACYTOUtcNAtkD/Y+MmFM1DTs0dqOKGan3VXKyPA==}
+    peerDependencies:
+      react: '>= 16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /text-table/0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}

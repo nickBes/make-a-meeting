@@ -24,12 +24,15 @@
     "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-text-truncate": "^0.19.0",
+    "tabler-icons-react": "^1.54.0",
     "ts-pattern": "^4.0.5"
   },
   "devDependencies": {
     "@types/node": "18.7.11",
     "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",
+    "@types/react-text-truncate": "^0.14.1",
     "eslint": "8.22.0",
     "eslint-config-next": "12.2.5",
     "prisma": "^4.2.1",
