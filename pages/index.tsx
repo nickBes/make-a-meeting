@@ -1,27 +1,21 @@
-import { useSession, signIn, signOut } from "next-auth/react"
 import React from "react"
-import { Button, Stack } from "@mantine/core"
+import { Button, Stack, Title, Container, Text } from "@mantine/core"
 import Link from "next/link"
+import Image from "next/image"
+import calendar from "@/static/calendar.jpg"
 
 const Home: React.FC = () => {
-    const { data: session, status } = useSession()
-    let Login: React.FC
-
-    if (session) {
-        Login = () => <Button onClick={() => signOut()}>Sign Out</Button>
-    } else {
-        Login = () => <Button onClick={() => signIn()}> Sign In</Button>
-    }
-
-    if (status === "loading") {
-        return <>Loading</>
-    }
-
     return (
-        <Stack align="center">
-            <Link href="/meetings">My Meetings</Link>
-            <Login />
-        </Stack>
+        <Container size="xs">
+            <Stack style={{ minHeight: "70vh" }} justify="center" align="center">
+                <Title align="center">Create Meetings With The Highest Attendance</Title>
+                <Text color="dark" size="xl" align="center">By simply signing in, creating a meeting and sharing it you could get the date with the highest attendance</Text>
+                <Link href="/meetings/create">
+                    <Button uppercase>Create</Button>
+                </Link>
+                <Image src={calendar} />
+            </Stack>
+        </Container>
     )
 }
 

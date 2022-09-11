@@ -85,7 +85,7 @@ const Create: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> =
                                 <Card key={meeting.id} withBorder>
                                     <Stack align="stretch" justify="center">
                                         <Title order={2} color="dark" align="center">{meeting.name}</Title>
-                                        <Text align="center" color="dimmed">{meeting.desc == "" || !meeting.desc ? "There is not description" : <TextTruncate text={meeting.desc} />}</Text>
+                                        <Text align="center" color="dimmed">{meeting.desc == "" || !meeting.desc ? "There is no description" : <TextTruncate text={meeting.desc} />}</Text>
                                         <Group position="center">
                                             <Link href={`/meetings/${meeting.id}`}>
                                                 <Button uppercase variant="filled">View</Button>

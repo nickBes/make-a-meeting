@@ -4,7 +4,7 @@ import type { AppProps } from "next/app"
 import Menu from "@/components/menu"
 import { SessionProvider } from "next-auth/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createStyles, Header, MantineProvider, Title } from "@mantine/core"
+import { createStyles, Header, Text, MantineProvider, Title, Center } from "@mantine/core"
 import Link from "next/link"
 
 const queryClient = new QueryClient()
@@ -35,9 +35,14 @@ const app: React.FC<AppProps> = ({ Component, pageProps }) => {
                         <Menu />
                     </Header>
                     <Component {...pageProps} />
+                    <Center style={{ position: "absolute", bottom: "2%", width: "100%" }}>
+                        <footer >
+                            <Text color="dimmed">Made By <Link href="https://github.com/nickBes">Nick Bespaly</Link></Text>
+                        </footer>
+                    </Center>
                 </MantineProvider>
             </QueryClientProvider>
-        </SessionProvider>
+        </SessionProvider >
     )
 }
 

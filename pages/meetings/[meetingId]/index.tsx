@@ -101,7 +101,7 @@ const Meeting: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({ mee
             <Card style={{ minHeight: "40vh", display: "flex", alignItems: "center" }} withBorder p="xl">
                 <Stack justify="space-between" align="center">
                     <Title align="center">{meeting.name}</Title>
-                    <Text align="center" color="dimmed">{meeting.desc == "" || !meeting.desc ? "There is not description" : meeting.desc}</Text>
+                    <Text align="center" color="dimmed">{meeting.desc == "" || !meeting.desc ? "There is no description" : meeting.desc}</Text>
                     <Badge variant="dot">Highest attendance date</Badge>
 
                     {day ? <>
