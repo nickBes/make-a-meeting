@@ -13,7 +13,7 @@ const Home: React.FC = () => {
                 <Link href="/meetings/create">
                     <Button uppercase>Create</Button>
                 </Link>
-                <Image src={calendar} />
+                <Image alt="Decorative Calendar Image" src={calendar} />
             </Stack>
         </Container>
     )
