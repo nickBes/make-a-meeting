@@ -166,6 +166,8 @@ const Register: React.FC<InferGetServerSidePropsType<typeof getServerSideProps>>
                     <Title align="center" mt={10}>{name}</Title>
                     <Text align="center" color="dark" size="xl">Click on the calendar to edit your date registries</Text>
                     <Calendar
+                        weekendDays={[]}
+                        firstDayOfWeek="sunday"
                         size="lg"
                         fullWidth
                         value={Array.from(days).map(daysToDate)}

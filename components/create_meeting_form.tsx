@@ -69,6 +69,8 @@ const CreateMeetingForm: React.FC<CreateMeetingFormProps> = ({ onSubmited, onSuc
                     onChange={setDesc}
                     label="Meeting Description" />
                 <DateRangePicker
+                    firstDayOfWeek="sunday"
+                    weekendDays={[]}
                     withAsterisk
                     label="Meeting Dates"
                     minDate={new Date()}

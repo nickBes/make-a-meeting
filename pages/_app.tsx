@@ -28,18 +28,26 @@ const app: React.FC<AppProps> = ({ Component, pageProps }) => {
         <SessionProvider session={pageProps.session}>
             <QueryClientProvider client={queryClient}>
                 <MantineProvider>
-                    <Header
-                        className={classes.heading}
-                        height={60}>
-                        <Link href="/"><Title className={classes.mainTitle} order={3}>meetings</Title></Link>
-                        <Menu />
-                    </Header>
-                    <Component {...pageProps} />
-                    <Center style={{ position: "absolute", bottom: "2%", width: "100%" }}>
-                        <footer >
-                            <Text color="dimmed">Made By <Link href="https://github.com/nickBes">Nick Bespaly</Link></Text>
-                        </footer>
-                    </Center>
+                    <div style={{
+                        minHeight: "100vh",
+                        display: "flex",
+                        flexDirection: "column"
+                    }}>
+                        <Header style={{ flexGrow: 0 }}
+                            className={classes.heading}
+                            height={60}>
+                            <Link href="/"><Title className={classes.mainTitle} order={3}>meetings</Title></Link>
+                            <Menu />
+                        </Header>
+                        <div style={{ flexGrow: 1 }}>
+                            <Component {...pageProps} />
+                        </div>
+                        <Center pb={10} style={{ flexGrow: 0 }}>
+                            <footer >
+                                <Text color="dimmed">Made By <Link href="https://github.com/nickBes">Nick Bespaly</Link></Text>
+                            </footer>
+                        </Center>
+                    </div>
                 </MantineProvider>
             </QueryClientProvider>
         </SessionProvider >
