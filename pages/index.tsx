@@ -8,7 +8,7 @@ const Home: React.FC = () => {
     return (
         <Container size="xs">
             <Stack style={{ minHeight: "70vh" }} justify="center" align="center">
-                <Title align="center">Create Meetings With The Highest Attendance</Title>
+                <Title align="center">Create Meetings With The Highest Attendance!</Title>
                 <Text color="dark" size="xl" align="center">By simply signing in, creating a meeting and sharing it you could get the date with the highest attendance</Text>
                 <Link href="/meetings/create">
                     <Button uppercase>Create</Button>
